@@ -1,4 +1,7 @@
-name: weather_data
+    version: 2
+    sources:
+    
+    - name: weather_data
       schema: s_teresamesia
       tables:
         - name: weather_daily_raw
