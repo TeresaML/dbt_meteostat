@@ -1,11 +1,11 @@
-    WITH daily_raw AS (
+WITH daily_raw AS (
         SELECT
                 airport_code,
                 station_id,
                 JSON_ARRAY_ELEMENTS(extracted_data -> 'data') AS json_data
         FROM {{source('weather_data', 'weather_daily_raw')}}
-    ),
-    daily_flattened AS (
+),
+daily_flattened AS (
         SELECT  airport_code,
                 station_id,
                 (json_data->>'date')::DATE AS date,
@@ -20,6 +20,6 @@
                 (json_data->>'pres')::NUMERIC AS avg_pressure_hpa,
                 (json_data->>'tsun')::INTEGER AS sun_minutes
         FROM daily_raw
-    )
-    SELECT * 
-    FROM daily_flattened
+)
+SELECT * 
+FROM daily_flattened
