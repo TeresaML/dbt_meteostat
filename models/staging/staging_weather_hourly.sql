@@ -1,4 +1,4 @@
-    WITH hourly_raw AS (
+WITH hourly_raw AS (
         SELECT
                 airport_code,
                 station_id,
@@ -22,6 +22,6 @@
                 ,(json_data->>'tsun')::INTEGER AS sun_minutes
                 ,(json_data->>'coco')::INTEGER AS condition_code
         FROM hourly_raw
-    )
-    SELECT * 
+)
+SELECT * 
     FROM hourly_data
