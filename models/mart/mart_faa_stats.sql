@@ -42,8 +42,9 @@ WITH stats AS (
         -- 6. how many flights actually occurred in total (departures & arrivals)
         SUM(CASE WHEN cancelled = 0 AND diverted = 0 THEN 1 ELSE 0 END) AS total_flights_occurred
     FROM
+        {{ ref('joined_table') }}
         joined_table
     GROUP BY
         faa
 )
-SELECT * FROM stats;
+SELECT * FROM stats; 
