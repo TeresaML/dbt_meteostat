@@ -21,4 +21,4 @@ WITH stats AS (
     GROUP BY
         faa
 )
-SELECT * FROM stats;
+SELECT * FROM stats
