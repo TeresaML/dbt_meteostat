@@ -1,6 +1,6 @@
 {{
   config(
-    materialized='joined_table'
+    materialized= 'table'
   )
 }}
 SELECT
