@@ -1,10 +1,8 @@
-select * from prep_airports;
-select * from prep_flights;
-
-
-
--- neue tabelle machen und joinen 
-create table joined_table as
+{{
+  config(
+    materialized='joined_table'
+  )
+}}
 SELECT
     a.faa,
     a.name AS airport_name,
@@ -12,19 +10,10 @@ SELECT
     a.country,
     f.*
 FROM
-    prep_airports a
+    {{ ref('prep_airports') }} a
 LEFT JOIN
-    prep_flights f ON a.faa = f.origin;
+    {{ ref('prep_flights') }} f ON a.faa = f.origin
 
-
-
--- tabelle kontrolliren #check
-select * from joined_table;
-
-
-
-
---- XXX jetzt alles in eine Abfrgae packen XXX ---
 
 WITH stats AS (
     SELECT
@@ -41,10 +30,9 @@ WITH stats AS (
         SUM(CASE WHEN diverted = 1 THEN 1 ELSE 0 END) AS total_flights_diverted,
         -- 6. how many flights actually occurred in total (departures & arrivals)
         SUM(CASE WHEN cancelled = 0 AND diverted = 0 THEN 1 ELSE 0 END) AS total_flights_occurred
-    FROM
+      FROM
         {{ ref('joined_table') }}
-        joined_table
     GROUP BY
         faa
 )
-SELECT * FROM stats; 
+SELECT * FROM stats;
