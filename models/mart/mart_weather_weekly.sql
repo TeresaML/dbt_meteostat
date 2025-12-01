@@ -1,29 +1,46 @@
--- XXX In a table `mart_weather_weekly.sql` we want to see **all** weather stats from the `prep_weather_daily` model aggregated weekly. XXX ---
-
-SELECT * FROM staging_weather_daily;
 
 
-WITH daily_data AS (
-    SELECT
-        *, 
-        DATE_PART('day', date) AS date_day,          -- number of the day of month
-        DATE_PART('month', date) AS date_month,      -- number of the month of year
-        DATE_PART('year', date) AS date_year,        -- number of year
-        DATE_PART('week', date) AS cw,               -- number of the week of year
-        TO_CHAR(date, 'FMmonth') AS month_name,      -- name of the month
-        TO_CHAR(date, 'FMday') AS weekday,           -- name of the weekday
-        CASE
-            WHEN TO_CHAR(date, 'FMmonth') IN ('december', 'january', 'february') THEN 'winter'
-            WHEN TO_CHAR(date, 'FMmonth') IN ('march', 'april', 'may') THEN 'spring'
-            WHEN TO_CHAR(date, 'FMmonth') IN ('june', 'july', 'august') THEN 'summer'
-            WHEN TO_CHAR(date, 'FMmonth') IN ('september', 'october', 'november') THEN 'autumn'
-        END AS season
-    FROM staging_weather_daily
-    GROUP BY date_year, cw, airport_code, season
+-- xxx in a table `mart_weather_weekly.sql` we want to see **all** weather stats from the `prep_weather_daily` model aggregated weekly. xxx ---
+with daily_data as (
+    select
+        *,
+        date_part('day', date) as date_day,
+        date_part('month', date) as date_month,
+        date_part('year', date) as date_year,
+        date_part('week', date) as cw,
+        to_char(date, 'fmmonth') as month_name,
+        to_char(date, 'fmday') as weekday,
+        case
+            when to_char(date, 'fmmonth') in ('december', 'january', 'february') then 'winter'
+            when to_char(date, 'fmmonth') in ('march', 'april', 'may') then 'spring'
+            when to_char(date, 'fmmonth') in ('june', 'july', 'august') then 'summer'
+            when to_char(date, 'fmmonth') in ('september', 'october', 'november') then 'autumn'
+        end as season
+    from {{ ref('prep_weather_daily') }}
+),
+weekly_aggregation as (
+    select
+        date_year,
+        cw,
+        airport_code,
+        season,
+        avg(avg_temp_c) as avg_temp_c,
+        avg(min_temp_c) as avg_min_temp_c,
+        avg(max_temp_c) as avg_max_temp_c,
+        avg(precipitation_mm) as avg_precipitation_mm,
+        avg(max_snow_mm) as avg_max_snow_mm
+    from daily_data
+    group by date_year, cw, airport_code, season
 )
-SELECT *
-FROM daily_data
-ORDER BY date;
-
-
-AVG('avg_temp_c', 'avg_min_temo_c', 'avg_max_temp_c'_
+select
+    date_year,
+    cw,
+    airport_code,
+    season,
+    round(avg_temp_c, 2) as avg_temp_c,
+    round(avg_min_temp_c, 2) as avg_min_temp_c,
+    round(avg_max_temp_c, 2) as avg_max_temp_c,
+    round(avg_precipitation_mm, 2) as avg_precipitation_mm,
+    round(avg_max_snow_mm, 2) as avg_max_snow_mm
+from weekly_aggregation
+order by date_year, cw, airport_code;
