@@ -43,4 +43,4 @@ select
     round(avg_precipitation_mm, 2) as avg_precipitation_mm,
     round(avg_max_snow_mm, 2) as avg_max_snow_mm
 from weekly_aggregation
-order by date_year, cw, airport_code;
+order by date_year, cw, airport_code
