@@ -32,6 +32,4 @@ left join  origin_info oi on o.origin = oi.origin
 left join dest_info di on o.dest = di.dest
 group by o.origin, o.dest, oi.city, oi.country, oi.airport_name, di.city, di.country, di.airport_name
 order by o.origin, o.dest
-)
 
-select from origin_info 
